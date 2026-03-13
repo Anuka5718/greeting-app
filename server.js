@@ -1,58 +1,19 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const PORT = 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 let storedName = '';
 
-app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>Welcome</title>
-    </head>
-    <body>
-      <h1>Welcome</h1>
-      <p>Please enter your name to receive a greeting.</p>
-      <form action="/greet" method="POST">
-        <input type="text" name="name" placeholder="Enter your name" required />
-        <br/><br/>
-        <button type="submit">Get Greeting</button>
-      </form>
-    </body>
-    </html>
-  `);
-});
-
+// POST /greet — receive name, store it, return it as JSON
 app.post('/greet', (req, res) => {
   const { name } = req.body;
   storedName = name;
-  res.redirect('/greeting');
-});
-
-app.get('/greeting', (req, res) => {
-  if (!storedName) {
-    return res.redirect('/');
-  }
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>Greeting</title>
-    </head>
-    <body>
-      <h1>Hello, ${storedName}!</h1>
-      <a href="/">Go Back</a>
-    </body>
-    </html>
-  `);
+  res.json({ name: storedName });
 });
 
 app.listen(PORT, () => {
